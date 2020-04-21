@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">NewsApp</string>
+    <string name="nav_home_label">Home</string>
+    <string name="nav_headlines_label">Headlines</string>
+    <string name="nav_trending_label">Trending</string>
+    <string name="nav_bookmarks_label">Bookmarks</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
