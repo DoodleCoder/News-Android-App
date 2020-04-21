@@ -33,9 +33,6 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-//    SharedPreferences pref = getContext().getSharedPreferences("MyPref", 0); // 0 - for private mode
-//    SharedPreferences.Editor editor = pref.edit();
-
     View v;
     private RecyclerView recyclerView;
     private List<Article> lstArticle;
@@ -45,17 +42,13 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        lstArticle = new ArrayList<>();
-        requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        parseJSON();
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_home, container, false);
+        lstArticle = new ArrayList<>();
+        requestQueue = Volley.newRequestQueue(getContext());
+        parseJSON();
         return v;
     }
 
