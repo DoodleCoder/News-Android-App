@@ -27,8 +27,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     List<Article> mData;
     Dialog myDialog;
 
-    SharedPreferences pref = mContext.getSharedPreferences("MyPref", 0); // 0 - for private mode
-    SharedPreferences.Editor editor = pref.edit();
+//    SharedPreferences pref = mContext.getSharedPreferences("MyPref", 0); // 0 - for private mode
+//    SharedPreferences.Editor editor = pref.edit();
 
     public RecyclerViewAdapter(Context mContext, List<Article> mData) {
         this.mContext = mContext;
