@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
@@ -73,6 +76,7 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
                 Picasso.with(mContext).load(mData.get(myViewHolder.getAdapterPosition()).getImage()).fit().centerCrop().into(dialog_image_iv);
 
                 dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
+                ImageViewCompat.setImageTintList(dialog_image_bookmark, ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.bookmarkRed)));
 
                 dialog_image_bookmark.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -109,7 +113,49 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
     public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
         final Article a = mData.get(position);
         holder.title.setText(a.getTitle());
-        holder.date.setText(a.getDate());
+        String date = a.getDate();
+        String m = "";
+        switch(date.substring(5,7)) {
+            case "01":
+                m = "Jan";
+                break;
+            case "02":
+                m = "Feb";
+                break;
+            case "03":
+                m = "Mar";
+                break;
+            case "04":
+                m = "Apr";
+                break;
+            case "05":
+                m = "May";
+                break;
+            case "06":
+                m = "Jun";
+                break;
+            case "07":
+                m = "July";
+                break;
+            case "08":
+                m = "Aug";
+                break;
+            case "09":
+                m = "Sep";
+                break;
+            case "10":
+                m = "Oct";
+                break;
+            case "11":
+                m = "Nov";
+                break;
+            case "12":
+                m = "Dec";
+                break;
+            default:
+                m = "DEF";
+        }
+        holder.date.setText(date.substring(8,10) + " " + m);
         holder.section.setText(a.getSection());
         holder.bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
 

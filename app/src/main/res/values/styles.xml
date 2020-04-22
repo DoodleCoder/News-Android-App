@@ -13,5 +13,8 @@
         <item name="colorAccent">@color/colorAccent</item>
         <item name="android:background">#f7f7f7</item>
     </style>
+    <style name="AppTheme.Launcher">
+        <item name="android:windowBackground">@drawable/icon_news</item>
+    </style>
 
 </resources>

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.net.Uri;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ImageViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
@@ -66,6 +69,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 ImageView dialog_image_twitter = (ImageView) myDialog.findViewById(R.id.dialog_twitter);
                 final ImageView dialog_image_bookmark = (ImageView) myDialog.findViewById(R.id.dialog_bookmark);
                 final String id = mData.get(myViewHolder.getAdapterPosition()).getId();
+
+                ImageViewCompat.setImageTintList(dialog_image_bookmark, ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.bookmarkRed)));
 
                 dialog_title_tv.setText(mData.get(myViewHolder.getAdapterPosition()).getTitle());
                 Picasso.with(mContext).load(mData.get(myViewHolder.getAdapterPosition()).getImage()).fit().centerCrop().into(dialog_image_iv);
