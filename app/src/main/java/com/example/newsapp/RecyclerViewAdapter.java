@@ -45,82 +45,9 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-
         View v;
         v = LayoutInflater.from(mContext).inflate(R.layout.article,parent,false);
         final MyViewHolder myViewHolder = new MyViewHolder(v);
-
-        // Open detail page
-        myViewHolder.item_article.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(mContext, "Test click will create intent" + String.valueOf(myViewHolder.getAdapterPosition()), Toast.LENGTH_LONG).show();
-            }
-        });
-
-        myDialog = new Dialog(mContext);
-        myDialog.setContentView(R.layout.article_dialog);
-        // Open dialog
-        myViewHolder.item_article.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                TextView dialog_title_tv = (TextView) myDialog.findViewById(R.id.dialog_title);
-                ImageView dialog_image_iv = (ImageView) myDialog.findViewById(R.id.dialog_image);
-                ImageView dialog_image_twitter = (ImageView) myDialog.findViewById(R.id.dialog_twitter);
-                final ImageView dialog_image_bookmark = (ImageView) myDialog.findViewById(R.id.dialog_bookmark);
-                final String id = mData.get(myViewHolder.getAdapterPosition()).getId();
-
-                ImageViewCompat.setImageTintList(dialog_image_bookmark, ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.bookmarkRed)));
-
-                dialog_title_tv.setText(mData.get(myViewHolder.getAdapterPosition()).getTitle());
-                Picasso.with(mContext).load(mData.get(myViewHolder.getAdapterPosition()).getImage()).fit().centerCrop().into(dialog_image_iv);
-
-                if(mPrefs.getString(id,"").length() != 0) {
-                    dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
-                }
-                else {
-                    dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
-                }
-
-                dialog_image_bookmark.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        if(mPrefs.getString(id,"").length() != 0) {
-                            //remove
-                            editor.remove(id);
-                            editor.commit();
-                            dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
-                            myViewHolder.bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
-                            Toast.makeText(mContext,"\"" + mData.get(myViewHolder.getAdapterPosition()).getTitle() + "\" was removed from bookmarks",Toast.LENGTH_LONG).show();
-                        }
-                        else {
-                            //add
-                            Gson gson = new Gson();
-                            String json = gson.toJson(mData.get(myViewHolder.getAdapterPosition()));
-                            editor.putString(id,json);
-                            editor.commit();
-                            dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
-                            myViewHolder.bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
-                            Toast.makeText(mContext,"\"" + mData.get(myViewHolder.getAdapterPosition()).getTitle() + "\" was added to bookmarks",Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-                dialog_image_twitter.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        String text = "Check out this link: ";
-                        String url = "http://www.twitter.com/intent/tweet?url=" + mData.get(myViewHolder.getAdapterPosition()).getUrl() + "&text=" + text + "&hashtags=CSCI571NewsSearch";
-                        Intent i = new Intent(Intent.ACTION_VIEW);
-                        i.setData(Uri.parse(url));
-                        mContext.startActivity(i);
-                    }
-                });
-                myDialog.show();
-                return true;
-            }
-        });
-
-
         return myViewHolder;
     }
 
@@ -142,6 +69,16 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             holder.bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
         }
 
+        holder.item_article.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                    Intent i = new Intent(v.getContext(), ArticleActivity.class);
+                    i.putExtra("ID",a.getId());
+                    mContext.startActivity(i);
+//                    Toast.makeText(mContext, "Test click will create intent" + String.valueOf(holder.getAdapterPosition()), Toast.LENGTH_LONG).show();
+            }
+        });
+
         holder.bookmark.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -161,6 +98,69 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 }
             }
         });
+
+        myDialog = new Dialog(mContext);
+        myDialog.setContentView(R.layout.article_dialog);
+        // Open dialog
+        holder.item_article.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                TextView dialog_title_tv = (TextView) myDialog.findViewById(R.id.dialog_title);
+                ImageView dialog_image_iv = (ImageView) myDialog.findViewById(R.id.dialog_image);
+                ImageView dialog_image_twitter = (ImageView) myDialog.findViewById(R.id.dialog_twitter);
+                final ImageView dialog_image_bookmark = (ImageView) myDialog.findViewById(R.id.dialog_bookmark);
+                final String id = mData.get(holder.getAdapterPosition()).getId();
+
+                ImageViewCompat.setImageTintList(dialog_image_bookmark, ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.bookmarkRed)));
+
+                dialog_title_tv.setText(mData.get(holder.getAdapterPosition()).getTitle());
+                Picasso.with(mContext).load(mData.get(holder.getAdapterPosition()).getImage()).fit().centerCrop().into(dialog_image_iv);
+
+                if(mPrefs.getString(id,"").length() != 0) {
+                    dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
+                }
+                else {
+                    dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
+                }
+
+                dialog_image_bookmark.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        if(mPrefs.getString(id,"").length() != 0) {
+                            //remove
+                            editor.remove(id);
+                            editor.commit();
+                            dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
+                            holder.bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
+                            Toast.makeText(mContext,"\"" + mData.get(holder.getAdapterPosition()).getTitle() + "\" was removed from bookmarks",Toast.LENGTH_LONG).show();
+                        }
+                        else {
+                            //add
+                            Gson gson = new Gson();
+                            String json = gson.toJson(mData.get(holder.getAdapterPosition()));
+                            editor.putString(id,json);
+                            editor.commit();
+                            dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
+                            holder.bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
+                            Toast.makeText(mContext,"\"" + mData.get(holder.getAdapterPosition()).getTitle() + "\" was added to bookmarks",Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                dialog_image_twitter.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String text = "Check out this link: ";
+                        String url = "http://www.twitter.com/intent/tweet?url=" + mData.get(holder.getAdapterPosition()).getUrl() + "&text=" + text + "&hashtags=CSCI571NewsSearch";
+                        Intent i = new Intent(Intent.ACTION_VIEW);
+                        i.setData(Uri.parse(url));
+                        mContext.startActivity(i);
+                    }
+                });
+                myDialog.show();
+                return true;
+            }
+        });
+
     }
 
     @Override

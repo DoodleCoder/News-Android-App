@@ -1,18 +1,27 @@
 package com.example.newsapp;
 
 public class Article {
-    private String title, image, url, section, id, date;
+    private String title, image, url, section, id, date, desc;
 
     public Article() {
     }
 
-    public Article(String id, String title, String image, String section,  String date, String url) {
+    public Article(String id, String title, String image, String section,  String date, String url, String desc) {
         this.title = title;
         this.image = image;
         this.url = url;
         this.section = section;
         this.id = id;
         this.date = date;
+        this.desc = desc;
+    }
+
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
+
+    public String getDesc() {
+        return desc;
     }
 
     public String getTitle() {

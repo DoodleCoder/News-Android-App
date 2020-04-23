@@ -70,7 +70,7 @@ public class HomeFragment extends Fragment {
                         section = article.getString("section");
                         url = article.getString("url");
 
-                        lstArticle.add(new Article(id, title, image, section, date, url));
+                        lstArticle.add(new Article(id, title, image, section, date, url,""));
 
                     }
 

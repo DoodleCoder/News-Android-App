@@ -55,7 +55,9 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
         myViewHolder.item_article.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Test click will create intent" + String.valueOf(myViewHolder.getAdapterPosition()), Toast.LENGTH_LONG).show();
+                Intent i = new Intent(v.getContext(), ArticleActivity.class);
+                i.putExtra("ID", mData.get(myViewHolder.getAdapterPosition()).getId());
+                mContext.startActivity(i);
             }
         });
 

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="Bookmark"
+        android:icon="@drawable/baseline_bookmark_border_black_24dp"
+        android:iconTint="@color/bookmarkRed"
+        android:id="@+id/appbar_bookmark"
+        app:showAsAction="always"/>
+    <item
+        android:title="Twitter"
+        android:icon="@drawable/bluetwitter"
+        android:id="@+id/appbar_twitter"
+        app:showAsAction="always"/>
+</menu>
