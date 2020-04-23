@@ -114,7 +114,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 ImageViewCompat.setImageTintList(dialog_image_bookmark, ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.bookmarkRed)));
 
                 dialog_title_tv.setText(mData.get(holder.getAdapterPosition()).getTitle());
-                Picasso.with(mContext).load(mData.get(holder.getAdapterPosition()).getImage()).fit().centerCrop().into(dialog_image_iv);
+                Picasso.with(mContext).load(mData.get(holder.getAdapterPosition()).getImage()).fit().centerInside().into(dialog_image_iv);
 
                 if(mPrefs.getString(id,"").length() != 0) {
                     dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);

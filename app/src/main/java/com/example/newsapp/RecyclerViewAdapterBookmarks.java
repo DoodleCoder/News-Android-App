@@ -47,6 +47,7 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Log.d("CALL","onCreateViewHolder");
         View v;
         v = LayoutInflater.from(mContext).inflate(R.layout.bookmark, parent, false);
         final MyViewHolder myViewHolder = new MyViewHolder(v);

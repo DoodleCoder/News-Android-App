@@ -6,7 +6,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.os.Handler;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,6 +42,7 @@ public class FragmentPolitics extends Fragment {
     private RecyclerView recyclerView;
     private List<Article> lstArticle;
     private RequestQueue requestQueue;
+    private SwipeRefreshLayout mSwipeRefreshLayout;
 
     public FragmentPolitics() {
     }
@@ -49,6 +52,22 @@ public class FragmentPolitics extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_politics, container, false);
+        mSwipeRefreshLayout = v.findViewById(R.id.swiperefresh_items);
+        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                parseJSON();
+                final Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if(mSwipeRefreshLayout.isRefreshing()) {
+                            mSwipeRefreshLayout.setRefreshing(false);
+                        }
+                    }
+                }, 1000);
+            }
+        });
         lstArticle = new ArrayList<>();
         requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
         parseJSON();

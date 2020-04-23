@@ -98,6 +98,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_margin="10dp"
+                    android:scrollHorizontally="true"
+                    android:ellipsize="end"
+                    android:maxLines="30"
                     android:text="DESC"
                     android:textSize="18dp" />
 

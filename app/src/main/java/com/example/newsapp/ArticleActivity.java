@@ -1,6 +1,7 @@
 package com.example.newsapp;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
@@ -8,7 +9,9 @@ import androidx.core.content.ContextCompat;
 import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -73,18 +76,19 @@ public class ArticleActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.appbar_menu_article, menu);
         MenuItem item = menu.getItem(0);
-//        Log.d("ID",""+id);
         if(mPrefs.getString(id,"").length() == 0) {
             item.setIcon(R.drawable.baseline_bookmark_border_black_24dp);
         }
         else {
             item.setIcon(R.drawable.baseline_bookmark_black_24dp);
         }
+        item.setIconTintList(ColorStateList.valueOf(getResources().getColor(R.color.bookmarkRed)));
         return super.onCreateOptionsMenu(menu);
     }
 
