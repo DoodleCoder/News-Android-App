@@ -94,6 +94,9 @@ public class ArticleActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_article);
 

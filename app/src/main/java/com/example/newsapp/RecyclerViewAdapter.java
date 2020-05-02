@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.net.Uri;
+import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.gson.Gson;
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.List;
+import java.util.TimeZone;
 
 
 public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.MyViewHolder> {
@@ -57,7 +61,46 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         final Article a = mData.get(position);
 
         holder.title.setText(a.getTitle());
-        holder.date.setText(a.getDate());
+
+        String d = a.getDate();
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+        try {
+            long time = sdf.parse(d).getTime();
+            long now = System.currentTimeMillis();
+            CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.SECOND_IN_MILLIS);
+            Log.d("DIFF", (String) ago);
+            String dateFinal = "", date = (String) ago;
+//            int pos = 1;
+//            if(date.charAt(pos) == ' ')
+//                pos = 1;
+//            else
+//                pos = 2;
+//
+//            dateFinal += (date.substring(0,pos));
+//
+//            if(date.charAt(pos) == 'h') {
+//                dateFinal += "h ago";
+//            }
+//            else if(date.charAt(pos) == 'm') {
+//                dateFinal += "m ago";
+//            }
+//            else {
+//                dateFinal += "s ago";
+//            }
+            date.replace(" second","s");
+            date.replace(" seconds","s");
+            date.replace(" minute","m");
+            date.replace(" minutes","m");
+            date.replace(" hour","h");
+            date.replace(" hours","h");
+
+            holder.date.setText(date);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
         holder.section.setText(a.getSection());
         String Imageurl = a.getImage();
         Picasso.with(mContext).load(Imageurl).fit().centerCrop().into(holder.image);
@@ -75,7 +118,6 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                     Intent i = new Intent(v.getContext(), ArticleActivity.class);
                     i.putExtra("ID",a.getId());
                     mContext.startActivity(i);
-//                    Toast.makeText(mContext, "Test click will create intent" + String.valueOf(holder.getAdapterPosition()), Toast.LENGTH_LONG).show();
             }
         });
 
