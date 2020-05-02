@@ -98,7 +98,7 @@ public class HomeFragment extends Fragment {
                         try {
                             JSONObject res = response.getJSONObject("response");
                             JSONArray jsonArray = res.getJSONArray("results");
-                            for(int i=0; i<jsonArray.length();i++) {
+                            for(int i=0; i<10;i++) {
                                 JSONObject article = jsonArray.getJSONObject(i);
                                 String id, title, image, section, d, date, url;
                                 id = article.getString("id");

@@ -138,7 +138,7 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
                 m = "Jun";
                 break;
             case "07":
-                m = "July";
+                m = "Jul";
                 break;
             case "08":
                 m = "Aug";
