@@ -58,15 +58,11 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView mMainNav;
     private FrameLayout mFrame;
 
-    private FusedLocationProviderClient client;
 
     private HomeFragment homeFragment;
     private HeadlinesFragment headlinesFragment;
     private TrendingFragment trendingFragment;
     protected BookmarksFragment bookmarksFragment;
-
-    private FusedLocationProviderClient mFusedLocationClient;
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -90,9 +86,6 @@ public class MainActivity extends AppCompatActivity {
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.app_bar);
         setSupportActionBar(toolbar);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        getLastLocation();
 
         mFrame = (FrameLayout) findViewById(R.id.main_appframe);
         mMainNav = (BottomNavigationView) findViewById(R.id.bottom_navbar);
@@ -137,121 +130,4 @@ public class MainActivity extends AppCompatActivity {
         fragmentTransaction.commit();
     }
 
-    @SuppressLint("MissingPermission")
-    private void getLastLocation(){
-        if (checkPermissions()) {
-            if (isLocationEnabled()) {
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                        new OnCompleteListener<Location>() {
-                            @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                Location location = task.getResult();
-                                if (location == null) {
-                                    requestNewLocationData();
-                                } else {
-                                    Log.d("LATITUDE1", location.getLatitude()+"");
-                                    Log.d("LONGITUDE1", location.getLongitude()+"");
-                                    double lat = location.getLatitude();
-                                    double lon = location.getLongitude();
-
-                                    String city="", state="", country="";
-
-                                    try {
-                                        Geocoder geocoder = new Geocoder(getApplicationContext(), Locale.getDefault());
-                                        List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-                                        city = addresses.get(0).getLocality();
-                                        state = addresses.get(0).getAdminArea();
-
-                                        TextView cityName = (TextView) findViewById(R.id.city);
-                                        cityName.setText(city);
-
-                                        TextView stateName = (TextView) findViewById(R.id.state);
-                                        stateName.setText(state);
-
-
-//                                        Log.d("ADDRESS", city + " " + state + " " + country);
-//                                        Log.d("LOCATION", addresses.get(0) + "     lol");
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }
-                        }
-                );
-            } else {
-                Toast.makeText(this, "Turn on location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
-            }
-        } else {
-            requestPermissions();
-        }
-    }
-
-
-    @SuppressLint("MissingPermission")
-    private void requestNewLocationData(){
-
-        @SuppressLint("RestrictedApi") LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(0);
-        mLocationRequest.setFastestInterval(0);
-        mLocationRequest.setNumUpdates(1);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        mFusedLocationClient.requestLocationUpdates(
-                mLocationRequest, mLocationCallback,
-                Looper.myLooper()
-        );
-
-    }
-
-    private LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
-        }
-    };
-
-    private boolean checkPermissions() {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        return false;
-    }
-
-    private void requestPermissions() {
-        ActivityCompat.requestPermissions(
-                this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                PERMISSION_ID
-        );
-    }
-
-    private boolean isLocationEnabled() {
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
-        );
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_ID) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getLastLocation();
-            }
-        }
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
-        if (checkPermissions()) {
-            getLastLocation();
-        }
-
-    }
 }
