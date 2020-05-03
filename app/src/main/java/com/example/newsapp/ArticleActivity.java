@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 
 import android.app.ActionBar;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,22 +100,34 @@ public class ArticleActivity extends AppCompatActivity {
         setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
 
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_article);
+
+        CardView article_card = (CardView) findViewById(R.id.article_card);
+        article_card.setVisibility(View.INVISIBLE);
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar_article_page);
+        progressBar.setVisibility(View.VISIBLE);
+
+        TextView loadingText = (TextView) findViewById(R.id.loading_text_article_page);
+        loadingText.setVisibility(View.VISIBLE);
+
 
         mPrefs = getSharedPreferences("MyPrefs",0);
         editor = mPrefs.edit();
 
         Toolbar toolbar = findViewById(R.id.app_bar_article);
         setSupportActionBar(toolbar);
-
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
+
 
         Intent i = getIntent();
         id = i.getStringExtra("ID");
         parseJSON(id);
+
+        progressBar.setVisibility(View.INVISIBLE);
+        loadingText.setVisibility(View.INVISIBLE);
     }
 
     public void parseJSON(String id) {
@@ -135,10 +149,6 @@ public class ArticleActivity extends AppCompatActivity {
                             data.getString("url"),
                             data.getString("part1") + data.getString("part2")
                     );
-                    progressBar = (ProgressBar) findViewById(R.id.progressBar_article);
-                    progressBar.setVisibility(View.GONE);
-                    TextView loadingText = (TextView) findViewById(R.id.loading_text);
-                    loadingText.setVisibility(View.GONE);
 
                     TextView tv_title = (TextView) findViewById(R.id.article_page_title);
                     TextView tv_date = (TextView) findViewById(R.id.article_page_date);
@@ -161,6 +171,8 @@ public class ArticleActivity extends AppCompatActivity {
                             startActivity(open_page);
                         }
                     });
+                    CardView article_card = (CardView) findViewById(R.id.article_card);
+                    article_card.setVisibility(View.VISIBLE);
 
                 } catch (JSONException e) {
                     e.printStackTrace();

@@ -15,7 +15,7 @@
             android:id="@+id/tablayout_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="4dp"
+            android:elevation="40dp"
             app:tabGravity="fill"
             app:tabIndicatorColor="#502ca7"
             app:tabMode="scrollable"

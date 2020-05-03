@@ -87,32 +87,31 @@ public class HomeFragment extends Fragment {
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void parseJSON() {
         Log.d("TAG","Making Request Home");
-        String url = "https://content.guardianapis.com/search?order-by=newest&show-fields=starRating,headline,thumbnail,short-url&api-key=05e44db8-acd9-42de-b08c-5b2b44a4eb7f";
+        String url = "https://hw8-node-backend.wl.r.appspot.com/app_home/1";
         LocalDateTime now = LocalDateTime.now();            //Local date time
         final ZoneId zoneId = ZoneId.of( "America/Los_Angeles" );        //Zone information
         final ZonedDateTime laNow = now.atZone( zoneId );
         final LocalDateTime localNow = laNow.toLocalDateTime();
+
+        lstArticle.clear();
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONObject res = response.getJSONObject("response");
-                            JSONArray jsonArray = res.getJSONArray("results");
-                            for(int i=0; i<10;i++) {
+                            JSONArray jsonArray = response.getJSONArray("data");
+                            for(int i=0; i<jsonArray.length(); i++) {
                                 JSONObject article = jsonArray.getJSONObject(i);
-                                String id, title, image, section, d, date, url;
+                                String id, title, image, section, date, url;
                                 id = article.getString("id");
-                                title = article.getString("webTitle");
-                                JSONObject fields = article.getJSONObject("fields");
-                                image = fields.getString("thumbnail");
-                                date = article.getString("webPublicationDate");
-                                section = article.getString("sectionName");
-                                url = "";
+                                title = article.getString("title");
+                                image = article.getString("image");
+                                date = article.getString("date");
+                                section = article.getString("section");
+                                url = article.getString("url");
 
                                 lstArticle.add(new Article(id, title, image, section, date, url,""));
-
                             }
 
                             recyclerView = (RecyclerView) v.findViewById(R.id.home_recyclerview);
