@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -58,9 +59,9 @@ public class BookmarksFragment extends Fragment {
             recyclerView = (RecyclerView) v.findViewById(R.id.bookmarks_recyclerview);
             RecyclerViewAdapterBookmarks recyclerViewAdapter = new RecyclerViewAdapterBookmarks(getContext(), lstArticle);
             recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
             recyclerView.setAdapter(recyclerViewAdapter);
             recyclerViewAdapter.notifyDataSetChanged();
-
             v.findViewById(R.id.empty_text).setVisibility(View.GONE);
         }
         else {

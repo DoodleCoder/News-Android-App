@@ -19,7 +19,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -69,6 +71,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 
 public class HomeFragment extends Fragment {
 
@@ -77,13 +81,11 @@ public class HomeFragment extends Fragment {
     private List<Article> lstArticle;
     private RequestQueue requestQueue;
     private ProgressBar progressBar;
+    private TextView loadingText;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private static final int PERMISSION_ID = 44;
-    private FusedLocationProviderClient mFusedLocationClient;
-    private double lat, lon;
     private RecyclerView home_recyclerview;
     private CardView weather_card;
-
+    private boolean loadCards, loadWeather;
     public HomeFragment() {
     }
 
@@ -92,15 +94,13 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_home, container, false);
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
 
         mSwipeRefreshLayout = v.findViewById(R.id.swiperefresh_items);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                Toast.makeText(getContext(), "REFRESH", Toast.LENGTH_SHORT).show();
                 parseJSON();
-                getLastLocation();
+                getCurrentLocation();
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -114,20 +114,22 @@ public class HomeFragment extends Fragment {
         });
 
         home_recyclerview = (RecyclerView) v.findViewById(R.id.home_recyclerview);
-        home_recyclerview.setVisibility(View.INVISIBLE);
-
         weather_card = (CardView) v.findViewById(R.id.weather_card);
-        weather_card.setVisibility(View.INVISIBLE);
-
         progressBar = (ProgressBar) v.findViewById(R.id.progressBar_home);
+        loadingText = (TextView) v.findViewById(R.id.loading_text);
+
+
+        home_recyclerview.setVisibility(View.INVISIBLE);
+        weather_card.setVisibility(View.INVISIBLE);
         progressBar.setVisibility(View.VISIBLE);
-        TextView loadingText = (TextView) v.findViewById(R.id.loading_text);
         loadingText.setVisibility(View.VISIBLE);
 
+        loadCards = false;
+        loadWeather = false;
 
         lstArticle = new ArrayList<>();
         requestQueue = Volley.newRequestQueue(getContext());
-        getLastLocation();
+        getCurrentLocation();
         parseJSON();
         return v;
     }
@@ -161,21 +163,17 @@ public class HomeFragment extends Fragment {
                             recyclerView = (RecyclerView) v.findViewById(R.id.home_recyclerview);
                             RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
 
-                            home_recyclerview = (RecyclerView) v.findViewById(R.id.home_recyclerview);
-                            home_recyclerview.setVisibility(View.VISIBLE);
+                            loadCards = true;
 
-                            weather_card = (CardView) v.findViewById(R.id.weather_card);
-                            weather_card.setVisibility(View.VISIBLE);
-
-                            progressBar = (ProgressBar) v.findViewById(R.id.progressBar_home);
-                            progressBar.setVisibility(View.GONE);
-                            TextView loadingText = (TextView) v.findViewById(R.id.loading_text);
-                            loadingText.setVisibility(View.GONE);
-
-
-
+                            if(loadWeather && loadCards) {
+                                home_recyclerview.setVisibility(View.VISIBLE);
+                                weather_card.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.INVISIBLE);
+                                loadingText.setVisibility(View.INVISIBLE);
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -191,173 +189,119 @@ public class HomeFragment extends Fragment {
     }
 
 
-    @SuppressLint("MissingPermission")
-    private void getLastLocation() {
-        if (checkPermissions()) {
-            if (isLocationEnabled()) {
-                mFusedLocationClient.getLastLocation().addOnCompleteListener(
-                        new OnCompleteListener<Location>() {
+    private void getCurrentLocation() {
+        Log.d("CALL","getCurrentLocation()");
+        @SuppressLint("RestrictedApi") final LocationRequest locationRequest = new LocationRequest();
+        locationRequest.setInterval(10000);
+        locationRequest.setFastestInterval(3000);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+        LocationServices.getFusedLocationProviderClient(getActivity()).requestLocationUpdates(locationRequest, new LocationCallback(){
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                super.onLocationResult(locationResult);
+                LocationServices.getFusedLocationProviderClient(getActivity()).removeLocationUpdates(this);
+                if(locationRequest != null && locationResult.getLocations().size() > 0) {
+                    int latestLocationIndex = locationResult.getLocations().size() - 1;
+                    double lat = locationResult.getLocations().get(latestLocationIndex).getLatitude();
+                    double lon = locationResult.getLocations().get(latestLocationIndex).getLongitude();
+                    Log.d("LATITUDE", lat+"");
+                    Log.d("LONGITUDE", lon+"");
+                    String city = "", state = "", country = "";
+
+                    try {
+                        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                        List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
+                        city = addresses.get(0).getLocality();
+                        state = addresses.get(0).getAdminArea();
+
+                        Log.d("CITY", city);
+                        Log.d("STATE", state);
+
+                        TextView cityName = (TextView) v.findViewById(R.id.city);
+                        cityName.setText(city);
+                        TextView stateName = (TextView) v.findViewById(R.id.state);
+                        stateName.setText(state);
+
+                        String url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=81c0990250dc7be0a363e70e12e21cc9";
+
+                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                             @Override
-                            public void onComplete(@NonNull Task<Location> task) {
-                                Location location = task.getResult();
-                                if (location == null) {
-                                    requestNewLocationData();
-                                } else {
-                                    Log.d("LATITUDE1", location.getLatitude() + "");
-                                    Log.d("LONGITUDE1", location.getLongitude() + "");
-                                    lat = location.getLatitude();
-                                    lon = location.getLongitude();
+                            public void onResponse(JSONObject response) {
+                                Log.d("RESPONSE_WEATHER", String.valueOf(response));
+                                try {
+                                    JSONObject main = response.getJSONObject("main");
+                                    String temp_raw = main.getString("temp");
+                                    int temp = (int) Math.rint(Double.parseDouble(temp_raw));
+                                    Log.d("TEMP", "" + temp);
 
-                                    String city = "", state = "", country = "";
+                                    JSONArray jsonArray = response.getJSONArray("weather");
+                                    JSONObject weather_obj = jsonArray.getJSONObject(0);
+                                    String summary = weather_obj.getString("main");
+                                    Log.d("WEATHER", summary + "");
 
-                                    try {
-                                        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-                                        List<Address> addresses = geocoder.getFromLocation(lat, lon, 1);
-                                        city = addresses.get(0).getLocality();
-                                        state = addresses.get(0).getAdminArea();
+                                    TextView tempName = (TextView) v.findViewById(R.id.temp);
+                                    tempName.setText(temp+"°C");
+                                    TextView weatherName = (TextView) v.findViewById(R.id.weather);
+                                    weatherName.setText(summary);
 
-                                        Log.d("CITY", city);
-                                        Log.d("STATE", state);
+                                    loadWeather = true;
 
-                                        TextView cityName = (TextView) v.findViewById(R.id.city);
-                                        cityName.setText(city);
-                                        TextView stateName = (TextView) v.findViewById(R.id.state);
-                                        stateName.setText(state);
+                                    LinearLayout image = v.findViewById(R.id.weather_image);
 
-                                        String url = "https://api.openweathermap.org/data/2.5/weather?q=" + city + "&units=metric&appid=81c0990250dc7be0a363e70e12e21cc9";
+                                    switch(summary) {
+                                        case "Clouds" :
+                                            image.setBackgroundResource(R.drawable.cloudy_weather);
+                                            break;
 
-                                        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                                            @Override
-                                            public void onResponse(JSONObject response) {
-                                                Log.d("RESPONSE_WEATHER", String.valueOf(response));
-                                                try {
-                                                    JSONObject main = response.getJSONObject("main");
-                                                    String temp_raw = main.getString("temp");
-                                                    int temp = (int) Math.rint(Double.parseDouble(temp_raw));
-                                                    Log.d("TEMP", "" + temp);
+                                        case "Clear":
+                                            image.setBackgroundResource(R.drawable.clear_weather);
+                                            break;
 
-                                                    JSONArray jsonArray = response.getJSONArray("weather");
-                                                    JSONObject weather_obj = jsonArray.getJSONObject(0);
-                                                    String summary = weather_obj.getString("main");
-                                                    Log.d("WEATHER", summary + "");
+                                        case "Snow":
+                                            image.setBackgroundResource(R.drawable.snowy_weather);
+                                            break;
 
-                                                    TextView tempName = (TextView) v.findViewById(R.id.temp);
-                                                    tempName.setText(temp+"°C");
-                                                    TextView weatherName = (TextView) v.findViewById(R.id.weather);
-                                                    weatherName.setText(summary);
+                                        case "Drizzle":
+                                        case "Rain":
+                                            image.setBackgroundResource(R.drawable.rainy_weather);
+                                            break;
 
-                                                    LinearLayout image = v.findViewById(R.id.weather_image);
+                                        case "Thunderstorm":
+                                            image.setBackgroundResource(R.drawable.thunder_weather);
+                                            break;
 
-                                                    switch(summary) {
-                                                        case "Clouds" : {
-                                                            image.setBackgroundResource(R.drawable.cloudy_weather);
-                                                            break;
-                                                        }
-                                                        case "Clear": {
-                                                            image.setBackgroundResource(R.drawable.clear_weather);
-                                                            break;
-                                                        }
-                                                        case "Snow": {
-                                                            image.setBackgroundResource(R.drawable.snowy_weather);
-                                                            break;
-                                                        }
-                                                        case "Rain/Drizzle": {
-                                                            image.setBackgroundResource(R.drawable.rainy_weather);
-                                                            break;
-                                                        }
-                                                        case "Thunderstorm": {
-                                                            image.setBackgroundResource(R.drawable.thunder_weather);
-                                                            break;
-                                                        }
-                                                        default : {
-                                                            image.setBackgroundResource(R.drawable.sunny_weather);
-                                                        }
-                                                    }
-
-                                                } catch (Exception e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        }, new Response.ErrorListener() {
-                                            @Override
-                                            public void onErrorResponse(VolleyError error) {
-                                                error.printStackTrace();
-                                            }
-                                        });
-                                        requestQueue.add(request);
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                        default :
+                                            image.setBackgroundResource(R.drawable.sunny_weather);
                                     }
+
+                                    loadWeather = true;
+
+                                    if(loadWeather && loadCards) {
+                                        home_recyclerview.setVisibility(View.VISIBLE);
+                                        weather_card.setVisibility(View.VISIBLE);
+                                        progressBar.setVisibility(View.INVISIBLE);
+                                        loadingText.setVisibility(View.INVISIBLE);
+                                    }
+
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
-                        }
-                );
-            } else {
-                Toast.makeText(getContext(), "Turn on location", Toast.LENGTH_LONG).show();
-                Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                startActivity(intent);
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                error.printStackTrace();
+                            }
+                        });
+                        requestQueue.add(request);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             }
-        } else {
-            requestPermissions();
-        }
-    }
+        }, Looper.getMainLooper());
 
-
-    @SuppressLint("MissingPermission")
-    private void requestNewLocationData() {
-
-        @SuppressLint("RestrictedApi") LocationRequest mLocationRequest = new LocationRequest();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        mLocationRequest.setInterval(0);
-        mLocationRequest.setFastestInterval(0);
-        mLocationRequest.setNumUpdates(1);
-
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(getContext());
-        mFusedLocationClient.requestLocationUpdates(
-                mLocationRequest, mLocationCallback,
-                Looper.myLooper()
-        );
-
-    }
-
-    private LocationCallback mLocationCallback = new LocationCallback() {
-        @Override
-        public void onLocationResult(LocationResult locationResult) {
-            Location mLastLocation = locationResult.getLastLocation();
-        }
-    };
-
-    private boolean checkPermissions() {
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED &&
-                ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            return true;
-        }
-        return false;
-    }
-
-    private void requestPermissions() {
-        ActivityCompat.requestPermissions(
-                getActivity(),
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION},
-                PERMISSION_ID
-        );
-    }
-
-    private boolean isLocationEnabled() {
-        LocationManager locationManager = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-                LocationManager.NETWORK_PROVIDER
-        );
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_ID) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getLastLocation();
-            }
-        }
     }
 
 }

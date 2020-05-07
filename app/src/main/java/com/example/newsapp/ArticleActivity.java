@@ -11,6 +11,7 @@ import android.app.ActionBar;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
+import android.graphics.Paint;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,6 +39,7 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
 public class ArticleActivity extends AppCompatActivity {
 
     private RequestQueue mQueue;
@@ -46,6 +48,8 @@ public class ArticleActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     SharedPreferences mPrefs;
     SharedPreferences.Editor editor;
+    private CardView article_card;
+    private TextView loadingText;
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
@@ -103,13 +107,12 @@ public class ArticleActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_article);
 
-        CardView article_card = (CardView) findViewById(R.id.article_card);
-        article_card.setVisibility(View.INVISIBLE);
-
+        article_card = (CardView) findViewById(R.id.article_card);
         progressBar = (ProgressBar) findViewById(R.id.progressBar_article_page);
-        progressBar.setVisibility(View.VISIBLE);
+        loadingText = (TextView) findViewById(R.id.loading_text_article_page);
 
-        TextView loadingText = (TextView) findViewById(R.id.loading_text_article_page);
+        progressBar.setVisibility(View.VISIBLE);
+        article_card.setVisibility(View.INVISIBLE);
         loadingText.setVisibility(View.VISIBLE);
 
 
@@ -119,15 +122,18 @@ public class ArticleActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.app_bar_article);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setHomeButtonEnabled(true);
 
 
         Intent i = getIntent();
         id = i.getStringExtra("ID");
         parseJSON(id);
 
-        progressBar.setVisibility(View.INVISIBLE);
-        loadingText.setVisibility(View.INVISIBLE);
+    }
+
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
     }
 
     public void parseJSON(String id) {
@@ -151,15 +157,73 @@ public class ArticleActivity extends AppCompatActivity {
                     );
 
                     TextView tv_title = (TextView) findViewById(R.id.article_page_title);
+
                     TextView tv_date = (TextView) findViewById(R.id.article_page_date);
+
                     TextView tv_desc = (TextView) findViewById(R.id.article_page_desc);
                     TextView tv_section = (TextView) findViewById(R.id.article_page_section);
                     ImageView iv = (ImageView) findViewById(R.id.article_page_image);
                     Button button = (Button) findViewById(R.id.article_page_button);
+
+                    button.setPaintFlags(Paint.UNDERLINE_TEXT_FLAG);
+
                     getSupportActionBar().setTitle(a.getTitle().substring(0,35) + "...");
 
                     tv_title.setText(a.getTitle());
-                    tv_date.setText(a.getDate());
+
+                    String write_date = "",m="", mon="",day="",year="", date= a.getDate();
+
+                    year = date.substring(0,4);
+                    mon = date.substring(5,7);
+
+                    switch(mon) {
+                        case "01":
+                            m = "Jan";
+                            break;
+                        case "02":
+                            m = "Feb";
+                            break;
+                        case "03":
+                            m = "Mar";
+                            break;
+                        case "04":
+                            m = "Apr";
+                            break;
+                        case "05":
+                            m = "May";
+                            break;
+                        case "06":
+                            m = "Jun";
+                            break;
+                        case "07":
+                            m = "Jul";
+                            break;
+                        case "08":
+                            m = "Aug";
+                            break;
+                        case "09":
+                            m = "Sep";
+                            break;
+                        case "10":
+                            m = "Oct";
+                            break;
+                        case "11":
+                            m = "Nov";
+                            break;
+                        case "12":
+                            m = "Dec";
+                            break;
+                        default:
+                            m = "DEF";
+                    }
+
+
+                    day = date.substring(8,10);
+
+                    write_date = day + " " + m + " " + year;
+
+                    tv_date.setText(write_date);
+
                     tv_desc.setText(a.getDesc());
                     tv_section.setText(a.getSection());
                     Picasso.with(getApplicationContext()).load(a.getImage()).fit().centerCrop().into(iv);
@@ -171,8 +235,11 @@ public class ArticleActivity extends AppCompatActivity {
                             startActivity(open_page);
                         }
                     });
-                    CardView article_card = (CardView) findViewById(R.id.article_card);
+
+                    progressBar.setVisibility(View.INVISIBLE);
+                    loadingText.setVisibility(View.INVISIBLE);
                     article_card.setVisibility(View.VISIBLE);
+
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -188,3 +255,4 @@ public class ArticleActivity extends AppCompatActivity {
     }
 
 }
+

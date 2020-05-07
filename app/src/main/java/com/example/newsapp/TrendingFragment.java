@@ -42,7 +42,7 @@ import java.util.Map;
 
 public class TrendingFragment extends Fragment {
 
-    private List<Entry> data = new ArrayList<Entry>();
+    private List<Entry> data;
     private String url = "https://hw8-node-backend.wl.r.appspot.com/trends?query=";
     private RequestQueue requestQueue;
     private String query;
@@ -97,14 +97,15 @@ public class TrendingFragment extends Fragment {
 
     public void jsonParse(final String query) {
         Log.d("JSONPARSE",query);
-        data.clear();
+//        data.clear();
+        data = new ArrayList<Entry>();
         requestQueue = Volley.newRequestQueue(getContext());
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url + query, null, new Response.Listener<JSONObject>() {
             @SuppressLint("LongLogTag")
             @Override
             public void onResponse(JSONObject response) {
                 try {
-                    chart.invalidate();
+//                    chart.invalidate();
                     JSONArray jsonArray = response.getJSONArray("data");
                     for(int i=0; i<jsonArray.length(); i++) {
                         JSONObject dataPoint = (JSONObject) jsonArray.get(i);
@@ -119,10 +120,20 @@ public class TrendingFragment extends Fragment {
                     legend.setTextSize(15f);
                     legend.setTextColor(Color.BLACK);
 
+                    dataSet.setCircleColor(Color.parseColor("#BB86FC"));
+                    dataSet.setCircleHoleColor(Color.parseColor("#BB86FC"));
+                    dataSet.setValueTextColor(Color.parseColor("#BB86FC"));
+
+                    chart.setDrawGridBackground(false);
+                    chart.getAxisLeft().setDrawGridLines(false);
+                    chart.getAxisRight().setDrawGridLines(false);
+
+                    chart.getXAxis().setDrawGridLines(false);
+
                     chart.setData(lineData);
                     chart.invalidate();
-                    lineData.notifyDataChanged();
-                    chart.notifyDataSetChanged();
+//                    lineData.notifyDataChanged();
+//                    chart.notifyDataSetChanged();
 
 
                 } catch (JSONException e) {

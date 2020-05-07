@@ -18,120 +18,121 @@
 
     </androidx.appcompat.widget.Toolbar>
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/loading_part"
-        android:layout_centerInParent="true">
-
-        <ProgressBar
-            android:id="@+id/progressBar_article_page"
-            style="?android:attr/progressBarStyleLarge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:elevation="4dp"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="300dp"
-            android:indeterminateDrawable="@drawable/progress" />
-
-        <TextView
-            android:id="@+id/loading_text_article_page"
-            android:layout_width="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:elevation="4dp"
-            android:layout_marginTop="375dp"
-            android:layout_height="wrap_content"
-            android:text="Fetching News" />
-
-    </RelativeLayout>
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         >
 
-        <androidx.cardview.widget.CardView
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:id="@+id/article_card"
-            android:layout_marginTop="?attr/actionBarSize"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent"
+            android:layout_centerInParent="true">
 
-            <LinearLayout
+            <ProgressBar
+                android:id="@+id/progressBar_article_page"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="300dp"
+                android:indeterminateDrawable="@drawable/progress" />
+
+            <TextView
+                android:id="@+id/loading_text_article_page"
+                android:layout_width="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:elevation="4dp"
+                android:layout_marginTop="375dp"
+                android:layout_height="wrap_content"
+                android:text="Fetching News" />
+
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:id="@+id/article_page_image"
-                    android:layout_width="match_parent"
-                    android:layout_height="300dp"
-                    android:src="@drawable/cloudy_weather" />
-
-                <TextView
-                    android:id="@+id/article_page_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginLeft="15dp"
-                    android:layout_marginRight="15dp"
-                    android:text="Title"
-                    android:textColor="@android:color/black"
-                    android:textSize="20dp"
-                    android:textStyle="bold" />
+                android:id="@+id/article_card"
+                android:layout_marginTop="?attr/actionBarSize"
+                android:layout_height="wrap_content">
 
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <ImageView
+                        android:id="@+id/article_page_image"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"
+                        android:src="@drawable/cloudy_weather" />
 
                     <TextView
-                        android:id="@+id/article_page_section"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginBottom="5dp"
-                        android:layout_marginTop="5dp"
-                        android:text="Section"
-                        android:textSize="16dp" />
-
-                    <TextView
-                        android:id="@+id/article_page_date"
+                        android:id="@+id/article_page_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginLeft="10dp"
-                        android:layout_marginRight="10dp"
-                        android:layout_marginTop="5dp"
-                        android:layout_marginBottom="5dp"
-                        android:gravity="right"
-                        android:text="Date"
-                        android:textSize="16dp" />
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginRight="15dp"
+                        android:text="Title"
+                        android:textColor="@android:color/black"
+                        android:textSize="20dp"
+                        android:textStyle="bold" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/article_page_section"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginBottom="5dp"
+                            android:layout_marginTop="5dp"
+                            android:text="Section"
+                            android:textSize="16dp" />
+
+                        <TextView
+                            android:id="@+id/article_page_date"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginLeft="10dp"
+                            android:layout_marginRight="10dp"
+                            android:layout_marginTop="5dp"
+                            android:layout_marginBottom="5dp"
+                            android:gravity="right"
+                            android:text="Date"
+                            android:textSize="16dp" />
+
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/article_page_desc"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:scrollHorizontally="true"
+                        android:ellipsize="end"
+                        android:maxLines="30"
+                        android:text="Desc"
+                        android:textSize="18dp" />
+
+                    <Button
+                        android:id="@+id/article_page_button"
+                        android:layout_width="match_parent"
+                        android:textSize="14dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="10dp"
+                        android:text="View Full Article"
+                        android:textAllCaps="false" />
+
 
                 </LinearLayout>
 
-                <TextView
-                    android:id="@+id/article_page_desc"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:scrollHorizontally="true"
-                    android:ellipsize="end"
-                    android:maxLines="30"
-                    android:text="Desc"
-                    android:textSize="18dp" />
+            </androidx.cardview.widget.CardView>
 
-                <Button
-                    android:id="@+id/article_page_button"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="10dp"
-                    android:text="View Full Article"
-                    android:textAllCaps="false" />
-
-            </LinearLayout>
-
-        </androidx.cardview.widget.CardView>
+        </RelativeLayout>
 
     </ScrollView>
 </RelativeLayout>

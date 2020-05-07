@@ -25,8 +25,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-
-
 public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerViewAdapterBookmarks.MyViewHolder> {
 
     Context mContext;
@@ -90,7 +88,12 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
                             editor.commit();
                             mData.remove(myViewHolder.getAdapterPosition());
                             myDialog.dismiss();
+                            Log.d("REMOVED ARTICLE",""+id);
                             notifyDataSetChanged();
+                            if(mData.size() == 0) {
+                                TextView empty_text = (TextView) v.findViewById(R.id.empty_text);
+                                empty_text.setVisibility(View.VISIBLE);
+                            }
                     }
                 });
                 dialog_image_twitter.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +116,12 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MyViewHolder holder, final int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
+        Log.d("CALL","onBindViewHolder" + mData.size());
+        if(mData.size() == 0) {
+            Log.d("SHOW","EMPTY TEXT");
+        }
+
         final Article a = mData.get(position);
         holder.title.setText(a.getTitle());
         String date = a.getDate();
@@ -173,6 +181,11 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
                 editor.commit();
                 mData.remove(position);
                 notifyDataSetChanged();
+                Log.d("Removed","Article");
+                if(mData.size() == 0) {
+                    Log.d("SHOW","EMPTY");
+//                    v.findViewById(R.id.empty_text).setVisibility(View.VISIBLE);
+                }
             }
         });
     }

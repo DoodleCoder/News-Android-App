@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -95,6 +96,7 @@ public class FragmentSports extends Fragment {
                             recyclerView = (RecyclerView) v.findViewById(R.id.sports_recyclerview);
                             RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
 
                             progressBar = (ProgressBar) v.findViewById(R.id.progressBar_sports);

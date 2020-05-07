@@ -1,22 +1,19 @@
 package com.example.newsapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-
-import android.os.Handler;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -32,26 +29,40 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FragmentTechnology extends Fragment {
+public class ShowSearchResultsActivity extends AppCompatActivity {
 
     private ProgressBar progressBar;
-    View v;
     private RecyclerView recyclerView;
     private List<Article> lstArticle;
     private RequestQueue requestQueue;
     private SwipeRefreshLayout mSwipeRefreshLayout;
 
-    public FragmentTechnology() {
-    }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        v = inflater.inflate(R.layout.fragment_technology, container, false);
-        mSwipeRefreshLayout = v.findViewById(R.id.swiperefresh_items);
+    protected void onCreate(Bundle savedInstanceState) {
+
+        setTheme(R.style.Theme_AppCompat_Light_NoActionBar);
+
+        super.onCreate(savedInstanceState);
+
+        setContentView(R.layout.activity_search);
+
+        Intent i = getIntent();
+        final String q = i.getStringExtra("Query");
+        Log.d("QUERY",q);
+
+
+        Toolbar toolbar = findViewById(R.id.search_appbar);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setTitle("Search Results for " + q);
+
+
+        mSwipeRefreshLayout = findViewById(R.id.swiperefresh_items);
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                parseJSON();
+                parseJSON(q);
                 final Handler handler = new Handler();
                 handler.postDelayed(new Runnable() {
                     @Override
@@ -63,46 +74,49 @@ public class FragmentTechnology extends Fragment {
                 }, 1000);
             }
         });
-        lstArticle = new ArrayList<>();
-        requestQueue = Volley.newRequestQueue(getActivity().getApplicationContext());
-        parseJSON();
-        return v;
+        requestQueue = Volley.newRequestQueue(this);
+        parseJSON(q);
     }
 
-    public void parseJSON() {
-        String url = "https://hw8-node-backend.wl.r.appspot.com/technology/1";
+    @Override
+    public boolean onSupportNavigateUp(){
+        finish();
+        return true;
+    }
+
+
+    public void parseJSON(String q) {
+        lstArticle = new ArrayList<>();
+        String url = "https://newsapp-backend-99.appspot.com/search?paper=0&id="+q;
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject response) {
                         try {
-                            JSONArray jsonArray = response.getJSONArray("data");
+                            JSONArray jsonArray = response.getJSONArray("articles");
                             for(int i=0; i<jsonArray.length();i++) {
                                 JSONObject article = jsonArray.getJSONObject(i);
-                                String id, title, image, section, date, url;
+                                String id, title, image, section, date, url, desc;
                                 id = article.getString("id");
                                 title = article.getString("title");
                                 image = article.getString("image");
                                 date = article.getString("date");
                                 section = article.getString("section");
                                 url = article.getString("url");
-
-                                lstArticle.add(new Article(id, title, image, section, date, url,""));
-
+                                desc = article.getString("description");
+                                lstArticle.add(new Article(id, title, image, section, date, url,desc));
                             }
 
-                            recyclerView = (RecyclerView) v.findViewById(R.id.tech_recyclerview);
-                            RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
-                            recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-                            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+                            recyclerView = (RecyclerView) findViewById(R.id.search_recyclerview);
+                            RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(ShowSearchResultsActivity.this, lstArticle);
+                            recyclerView.setLayoutManager(new LinearLayoutManager(ShowSearchResultsActivity.this));
+                            recyclerView.addItemDecoration(new DividerItemDecoration(ShowSearchResultsActivity.this, DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
 
-                            progressBar = (ProgressBar) v.findViewById(R.id.progressBar_technology);
+                            progressBar = (ProgressBar) findViewById(R.id.progressBar_search);
                             progressBar.setVisibility(View.GONE);
-                            TextView loadingText = (TextView) v.findViewById(R.id.loading_text);
+                            TextView loadingText = (TextView) findViewById(R.id.loading_text);
                             loadingText.setVisibility(View.GONE);
-
-
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -116,6 +130,4 @@ public class FragmentTechnology extends Fragment {
         });
         requestQueue.add(request);
     }
-
-
 }

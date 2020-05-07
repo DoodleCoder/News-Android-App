@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.net.Uri;
+import android.os.Build;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ImageViewCompat;
@@ -27,6 +29,10 @@ import com.squareup.picasso.Picasso;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -55,6 +61,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
         return myViewHolder;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
 
@@ -62,42 +69,66 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
 
         holder.title.setText(a.getTitle());
 
-        String d = a.getDate();
+        String date = a.getDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
         try {
-            long time = sdf.parse(d).getTime();
-            long now = System.currentTimeMillis();
-            CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.SECOND_IN_MILLIS);
-            Log.d("DIFF", (String) ago);
-            String dateFinal = "", date = (String) ago;
-//            int pos = 1;
-//            if(date.charAt(pos) == ' ')
-//                pos = 1;
-//            else
-//                pos = 2;
-//
-//            dateFinal += (date.substring(0,pos));
-//
-//            if(date.charAt(pos) == 'h') {
-//                dateFinal += "h ago";
-//            }
-//            else if(date.charAt(pos) == 'm') {
-//                dateFinal += "m ago";
-//            }
+            LocalDateTime published = LocalDateTime.ofInstant(Instant.parse(date), ZoneId.of("America/Los_Angeles"));
+            LocalDateTime current = LocalDateTime.now();
+            long minutes = ChronoUnit.MINUTES.between(published, current);
+            long hours = ChronoUnit.HOURS.between(published, current);
+            long seconds = ChronoUnit.SECONDS.between(published, current);
+            long days = ChronoUnit.DAYS.between(published, current);
+//            long months = ChronoUnit.DAYS.between(published, current);
+
+            String write_date = "";
+            if (days > 0)
+                write_date = days + "d ago";
+            else if(hours > 0)
+                write_date = hours + "h ago";
+            else if(minutes > 0)
+                write_date = minutes + "m ago";
+            else
+                write_date = Math.abs(seconds) + "s ago";
 //            else {
-//                dateFinal += "s ago";
+//                long time = sdf.parse(date).getTime();
+//                long now = System.currentTimeMillis();
+//                CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.SECOND_IN_MILLIS);
+//                Log.d("DIFF1", (String) ago);
+//                write_date = (String) ago;
+//                write_date.replace(" second","s");
+//                write_date.replace(" seconds","s");
 //            }
-            date.replace(" second","s");
-            date.replace(" seconds","s");
-            date.replace(" minute","m");
-            date.replace(" minutes","m");
-            date.replace(" hour","h");
-            date.replace(" hours","h");
+            Log.d("DIFF(D,H,M,S)","("+days+","+hours+","+minutes+","+seconds+")");
+            Log.d("DIFF2",write_date);
+//            String dateFinal = "", date = (String) ago;
+////            int pos = 1;
+////            if(date.charAt(pos) == ' ')
+////                pos = 1;
+////            else
+////                pos = 2;
+////
+////            dateFinal += (date.substring(0,pos));
+////
+////            if(date.charAt(pos) == 'h') {
+////                dateFinal += "h ago";
+////            }
+////            else if(date.charAt(pos) == 'm') {
+////                dateFinal += "m ago";
+////            }
+////            else {
+////                dateFinal += "s ago";
+////            }
+//            date.replace(" second","s");
+//            date.replace(" seconds","s");
+//            date.replace(" minute","m");
+//            date.replace(" minutes","m");
+//            date.replace(" hour","h");
+//            date.replace(" hours","h");
 
-            holder.date.setText(date);
+            holder.date.setText(write_date);
 
-        } catch (ParseException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
