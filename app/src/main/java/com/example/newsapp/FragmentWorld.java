@@ -41,7 +41,7 @@ public class FragmentWorld extends Fragment {
     private List<Article> lstArticle;
     private RequestQueue requestQueue;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
+    RecyclerViewAdapter recyclerViewAdapter;
 
     public FragmentWorld() {
     }
@@ -94,7 +94,7 @@ public class FragmentWorld extends Fragment {
                             }
 
                             recyclerView = (RecyclerView) v.findViewById(R.id.world_recyclerview);
-                            RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
+                            recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
@@ -119,4 +119,14 @@ public class FragmentWorld extends Fragment {
         requestQueue.add(request);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("FUNCTION", "RESUME");
+        try {
+            recyclerViewAdapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }

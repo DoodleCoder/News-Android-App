@@ -78,8 +78,14 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             long minutes = ChronoUnit.MINUTES.between(published, current);
             long hours = ChronoUnit.HOURS.between(published, current);
             long seconds = ChronoUnit.SECONDS.between(published, current);
+
+            if(seconds < 0) {
+                seconds += 40;
+                if(seconds > 60)
+                    minutes += 1;
+            }
+
             long days = ChronoUnit.DAYS.between(published, current);
-//            long months = ChronoUnit.DAYS.between(published, current);
 
             String write_date = "";
             if (days > 0)
@@ -89,18 +95,19 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
             else if(minutes > 0)
                 write_date = minutes + "m ago";
             else
-                write_date = Math.abs(seconds) + "s ago";
+//                if(seconds > 0)
+                write_date = seconds + "s ago";
 //            else {
 //                long time = sdf.parse(date).getTime();
 //                long now = System.currentTimeMillis();
-//                CharSequence ago = DateUtils.getRelativeTimeSpanString(time, now, DateUtils.SECOND_IN_MILLIS);
+//                String ago = (String) DateUtils.getRelativeTimeSpanString(time, now, DateUtils.SECOND_IN_MILLIS);
+//                ago.replace(" second","s");
+//                ago.replace(" seconds","s");
 //                Log.d("DIFF1", (String) ago);
-//                write_date = (String) ago;
-//                write_date.replace(" second","s");
-//                write_date.replace(" seconds","s");
+//                write_date = ago;
 //            }
-            Log.d("DIFF(D,H,M,S)","("+days+","+hours+","+minutes+","+seconds+")");
-            Log.d("DIFF2",write_date);
+//            Log.d("DIFF(D,H,M,S)","("+days+","+hours+","+minutes+","+seconds+")");
+//            Log.d("DIFF2",write_date);
 //            String dateFinal = "", date = (String) ago;
 ////            int pos = 1;
 ////            if(date.charAt(pos) == ' ')
@@ -199,23 +206,27 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
                 dialog_image_bookmark.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(mPrefs.getString(id,"").length() != 0) {
-                            //remove
-                            editor.remove(id);
-                            editor.commit();
-                            dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
-                            holder.bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
-                            Toast.makeText(mContext,"\"" + mData.get(holder.getAdapterPosition()).getTitle() + "\" was removed from bookmarks",Toast.LENGTH_LONG).show();
-                        }
-                        else {
-                            //add
-                            Gson gson = new Gson();
-                            String json = gson.toJson(mData.get(holder.getAdapterPosition()));
-                            editor.putString(id,json);
-                            editor.commit();
-                            dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
-                            holder.bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
-                            Toast.makeText(mContext,"\"" + mData.get(holder.getAdapterPosition()).getTitle() + "\" was added to bookmarks",Toast.LENGTH_LONG).show();
+                        try {
+                            if (mPrefs.getString(id, "").length() != 0) {
+                                //remove
+                                editor.remove(id);
+                                editor.commit();
+                                dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
+                                holder.bookmark.setImageResource(R.drawable.baseline_bookmark_border_black_24dp);
+                                Toast.makeText(mContext, "\"" + mData.get(holder.getAdapterPosition()).getTitle() + "\" was removed from bookmarks", Toast.LENGTH_LONG).show();
+                            } else {
+                                //add
+                                Gson gson = new Gson();
+                                String json = gson.toJson(mData.get(holder.getAdapterPosition()));
+                                editor.putString(id, json);
+                                editor.commit();
+                                dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
+                                holder.bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
+                                Toast.makeText(mContext, "\"" + mData.get(holder.getAdapterPosition()).getTitle() + "\" was added to bookmarks", Toast.LENGTH_LONG).show();
+                            }
+                        }catch (Exception e) {
+                            Toast.makeText(mContext, "Could not find the requested article",Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
                         }
                     }
                 });
@@ -240,6 +251,7 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapte
     public int getItemCount() {
         return mData.size();
     }
+
 
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {

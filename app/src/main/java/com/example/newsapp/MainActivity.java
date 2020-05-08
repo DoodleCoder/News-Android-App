@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
     private TrendingFragment trendingFragment;
     protected BookmarksFragment bookmarksFragment;
 
+    @SuppressLint("RestrictedApi")
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -99,6 +100,8 @@ public class MainActivity extends AppCompatActivity {
         final SearchView searchView = (SearchView) search.getActionView();
 
         final SearchView.SearchAutoComplete searchAutoComplete = (SearchView.SearchAutoComplete) searchView.findViewById(R.id.search_src_text);
+
+        searchAutoComplete.setThreshold(3);
 
         newsAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line);
         searchAutoComplete.setAdapter(newsAdapter);

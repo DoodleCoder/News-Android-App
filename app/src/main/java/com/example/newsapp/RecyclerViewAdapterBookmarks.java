@@ -10,7 +10,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,11 +35,14 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
     Dialog myDialog;
     SharedPreferences mPrefs;
     SharedPreferences.Editor editor;
+    View v;
+    TextView tv_empty;
 
 
-    public RecyclerViewAdapterBookmarks(Context mContext, List<Article> mData) {
+    public RecyclerViewAdapterBookmarks(Context mContext, List<Article> mData, TextView empty) {
         this.mContext = mContext;
         this.mData = mData;
+        this.tv_empty = empty;
         this.mPrefs = mContext.getSharedPreferences("MyPrefs", 0);
         editor = mPrefs.edit();
     }
@@ -45,15 +51,13 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
     @NonNull
     @Override
     public MyViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d("CALL","onCreateViewHolder");
-        View v;
         v = LayoutInflater.from(mContext).inflate(R.layout.bookmark, parent, false);
         final MyViewHolder myViewHolder = new MyViewHolder(v);
 
         // Open detail page
         myViewHolder.item_article.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+                @Override
+                public void onClick(View v) {
                 Intent i = new Intent(v.getContext(), ArticleActivity.class);
                 i.putExtra("ID", mData.get(myViewHolder.getAdapterPosition()).getId());
                 mContext.startActivity(i);
@@ -79,21 +83,28 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
                 dialog_image_bookmark.setImageResource(R.drawable.baseline_bookmark_black_24dp);
                 ImageViewCompat.setImageTintList(dialog_image_bookmark, ColorStateList.valueOf(ContextCompat.getColor(mContext, R.color.bookmarkRed)));
 
+//                String tttt = mData.get
+
                 dialog_image_bookmark.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        try{
                             //remove
                             Toast.makeText(mContext,"\"" + mData.get(myViewHolder.getAdapterPosition()).getTitle() + "\" was removed from bookmarks",Toast.LENGTH_LONG).show();
                             editor.remove(id);
                             editor.commit();
                             mData.remove(myViewHolder.getAdapterPosition());
+                            if(mData.size() == 0) {
+                                tv_empty.setVisibility(View.VISIBLE);
+                            }
                             myDialog.dismiss();
                             Log.d("REMOVED ARTICLE",""+id);
                             notifyDataSetChanged();
-                            if(mData.size() == 0) {
-                                TextView empty_text = (TextView) v.findViewById(R.id.empty_text);
-                                empty_text.setVisibility(View.VISIBLE);
-                            }
+
+                        } catch (Exception e) {
+                            Toast.makeText(mContext, "Could not find the requested article",Toast.LENGTH_SHORT).show();
+                            e.printStackTrace();
+                        }
                     }
                 });
                 dialog_image_twitter.setOnClickListener(new View.OnClickListener() {
@@ -111,20 +122,16 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
             }
         });
 
-
         return myViewHolder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         Log.d("CALL","onBindViewHolder" + mData.size());
-        if(mData.size() == 0) {
-            Log.d("SHOW","EMPTY TEXT");
-        }
-
         final Article a = mData.get(position);
         holder.title.setText(a.getTitle());
         String date = a.getDate();
+
         String m = "";
         switch(date.substring(5,7)) {
             case "01":
@@ -180,12 +187,10 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
                 editor.remove(a.getId());
                 editor.commit();
                 mData.remove(position);
+                if(mData.size() == 0)
+                     tv_empty.setVisibility(View.VISIBLE);
                 notifyDataSetChanged();
                 Log.d("Removed","Article");
-                if(mData.size() == 0) {
-                    Log.d("SHOW","EMPTY");
-//                    v.findViewById(R.id.empty_text).setVisibility(View.VISIBLE);
-                }
             }
         });
     }
@@ -197,7 +202,7 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
 
     public static class MyViewHolder extends RecyclerView.ViewHolder {
 
-        private TextView title, section, date, empty;
+        private TextView title, section, date;
         private ImageView image;
         private ImageView bookmark;
         private CardView item_article;
@@ -209,7 +214,6 @@ public class RecyclerViewAdapterBookmarks extends RecyclerView.Adapter<RecyclerV
             title = (TextView) itemView.findViewById(R.id.bookmark_card_title);
             section = (TextView) itemView.findViewById(R.id.bookmark_card_section);
             date = (TextView) itemView.findViewById(R.id.bookmark_card_date);
-            empty = (TextView) itemView.findViewById(R.id.empty_text);
             image = (ImageView) itemView.findViewById(R.id.bookmark_card_image);
             bookmark = (ImageView) itemView.findViewById(R.id.bookmark_card_bookmark);
         }

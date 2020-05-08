@@ -85,6 +85,7 @@ public class HomeFragment extends Fragment {
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private RecyclerView home_recyclerview;
     private CardView weather_card;
+    private RecyclerViewAdapter recyclerViewAdapter;
     private boolean loadCards, loadWeather;
     public HomeFragment() {
     }
@@ -161,7 +162,7 @@ public class HomeFragment extends Fragment {
                             }
 
                             recyclerView = (RecyclerView) v.findViewById(R.id.home_recyclerview);
-                            RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
+                            recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
@@ -188,6 +189,16 @@ public class HomeFragment extends Fragment {
         requestQueue.add(request);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("FUNCTION", "RESUME");
+        try {
+            recyclerViewAdapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     private void getCurrentLocation() {
         Log.d("CALL","getCurrentLocation()");

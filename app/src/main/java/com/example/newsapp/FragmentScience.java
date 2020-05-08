@@ -40,6 +40,7 @@ public class FragmentScience extends Fragment {
     private List<Article> lstArticle;
     private RequestQueue requestQueue;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerViewAdapter recyclerViewAdapter;
 
     public FragmentScience() {
     }
@@ -93,7 +94,7 @@ public class FragmentScience extends Fragment {
                             }
 
                             recyclerView = (RecyclerView) v.findViewById(R.id.science_recyclerview);
-                            RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
+                            recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
@@ -116,6 +117,17 @@ public class FragmentScience extends Fragment {
             }
         });
         requestQueue.add(request);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("FUNCTION", "RESUME");
+        try {
+            recyclerViewAdapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 

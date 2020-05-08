@@ -49,8 +49,12 @@
 
             <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
+                android:layout_centerHorizontal="true"
                 android:id="@+id/article_card"
-                android:layout_marginTop="?attr/actionBarSize"
+                app:cardCornerRadius="10dp"
+                android:layout_marginRight="3dp"
+                android:layout_marginLeft="3dp"
+                android:layout_marginTop="70dp"
                 android:layout_height="wrap_content">
 
                 <LinearLayout

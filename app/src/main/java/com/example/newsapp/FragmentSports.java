@@ -41,6 +41,7 @@ public class FragmentSports extends Fragment {
     private List<Article> lstArticle;
     private RequestQueue requestQueue;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerViewAdapter recyclerViewAdapter;
 
     public FragmentSports() {
     }
@@ -94,7 +95,7 @@ public class FragmentSports extends Fragment {
                             }
 
                             recyclerView = (RecyclerView) v.findViewById(R.id.sports_recyclerview);
-                            RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
+                            recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
@@ -119,5 +120,15 @@ public class FragmentSports extends Fragment {
         requestQueue.add(request);
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("FUNCTION", "RESUME");
+        try {
+            recyclerViewAdapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
 }

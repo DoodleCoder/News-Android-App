@@ -33,7 +33,8 @@ public class BookmarksFragment extends Fragment {
     private ProgressBar progressBar;
     SharedPreferences mPref;
     SharedPreferences.Editor editor;
-
+    RecyclerViewAdapterBookmarks recyclerViewAdapter;
+    TextView tv_empty;
 
     public BookmarksFragment() {
     }
@@ -42,30 +43,47 @@ public class BookmarksFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         v = inflater.inflate(R.layout.fragment_bookmarks, container, false);
-        lstArticle = new ArrayList<>();
+        tv_empty = v.findViewById(R.id.empty_text);
         mPref = getActivity().getApplicationContext().getSharedPreferences("MyPrefs", 0);
         parseJSON();
         return v;
     }
 
     public void parseJSON() {
+        lstArticle = new ArrayList<>();
         Map<String, ?> allEntries = mPref.getAll();
         for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
             Gson gson = new Gson();
             Article a = gson.fromJson(entry.getValue().toString(), Article.class);
             lstArticle.add(a);
         }
+        recyclerView = (RecyclerView) v.findViewById(R.id.bookmarks_recyclerview);
+        recyclerViewAdapter = new RecyclerViewAdapterBookmarks(v.getContext(), lstArticle, tv_empty);
+        recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
+        recyclerViewAdapter.notifyDataSetChanged();
+        recyclerView.setAdapter(recyclerViewAdapter);
+
         if(lstArticle.size() > 0) {
-            recyclerView = (RecyclerView) v.findViewById(R.id.bookmarks_recyclerview);
-            RecyclerViewAdapterBookmarks recyclerViewAdapter = new RecyclerViewAdapterBookmarks(getContext(), lstArticle);
-            recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 2));
-            recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-            recyclerView.setAdapter(recyclerViewAdapter);
-            recyclerViewAdapter.notifyDataSetChanged();
             v.findViewById(R.id.empty_text).setVisibility(View.GONE);
+            v.findViewById(R.id.bookmarks_recyclerview).setVisibility(View.VISIBLE);
         }
         else {
             v.findViewById(R.id.empty_text).setVisibility(View.VISIBLE);
+            v.findViewById(R.id.bookmarks_recyclerview).setVisibility(View.GONE);
         }
     }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("FUNCTION", "RESUME");
+        parseJSON();
+//        if (lstArticle.size() == 0) {
+//            v.findViewById(R.id.empty_text).setVisibility(View.VISIBLE);
+//        } else {
+//            v.findViewById(R.id.empty_text).setVisibility(View.INVISIBLE);
+//        }
+    }
+
 }

@@ -44,11 +44,21 @@ public class FragmentPolitics extends Fragment {
     private List<Article> lstArticle;
     private RequestQueue requestQueue;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private RecyclerViewAdapter recyclerViewAdapter;
 
     public FragmentPolitics() {
     }
 
-
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("FUNCTION", "RESUME");
+        try {
+            recyclerViewAdapter.notifyDataSetChanged();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -98,7 +108,7 @@ public class FragmentPolitics extends Fragment {
                             }
 
                             recyclerView = (RecyclerView) v.findViewById(R.id.politics_recyclerview);
-                            RecyclerViewAdapter recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
+                            recyclerViewAdapter = new RecyclerViewAdapter(getContext(), lstArticle);
                             recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
                             recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
                             recyclerView.setAdapter(recyclerViewAdapter);
